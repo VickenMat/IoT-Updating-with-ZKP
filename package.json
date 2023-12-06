@@ -1,0 +1,12 @@
+{
+  "name": "IoT-Updating-with-ZKP",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/VickenMat/IoT-Updating-with-ZKP.git",
+  "author": "Vicken Matiossian <113546737+VickenMat@users.noreply.github.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.2"
+  }
+}
