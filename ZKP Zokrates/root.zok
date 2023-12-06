@@ -1,0 +1,4 @@
+def main(private field s1, field s2, field s3) {
+    assert(s3 <= 1 - s1 * s2);
+    return;
+}

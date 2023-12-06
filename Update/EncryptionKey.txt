@@ -1,0 +1,16 @@
+=== File Containing Information ===
+
+Device Model: XYZ123
+Device ID: 123456789
+Manufacturer: Vicken LLC
+
+=== Encryption Key ===
+Key: b5c3deab13340d28f5a9cda9d53712e277902fe96028f48f08632057dab0a6df
+Hash Input: 714vicken107
+Algorithm: SHA-256
+
+=== Other Information ===
+Firmware Version: 2.0.1
+Last Update: 2023-11-15
+
+=== End of File ===

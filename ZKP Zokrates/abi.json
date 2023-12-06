@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    {
+      "name": "s1",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "s2",
+      "public": true,
+      "type": "field"
+    },
+    {
+      "name": "s3",
+      "public": true,
+      "type": "field"
+    }
+  ],
+  "output": {
+    "type": "tuple",
+    "components": {
+      "elements": []
+    }
+  }
+}
