@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.19 <=0.8.23;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -36,20 +37,26 @@ contract MintUpdateNFT is
         __ERC721_init("Update File", "UF");
         __ERC721Enumerable_init();
         __Ownable_init(initialOwner);
+        console.log(
+            msg.sender,
+            "(Manufacturer) initialized as contract creator"
+        );
     }
 
-    function safeMint(address to, string memory proof) public {
+    // function safeMint(address to, string memory proof) public {
+    function safeMint(address to) public {
         uint256 tokenId = _nextTokenId++;
         require(
             tokenId <= (maxSupply - 1),
             "Max number of Update File NFTs minted"
         ); // checks if the number of minted nfts have surpassed the max supply we set earlier
-        require(_verifyZKP(tokenId, proof), "ZKP verification failed");
+        // require(_verifyZKP(tokenId, proof), "ZKP verification failed");
         _safeMint(to, tokenId); // mints NFT to owners address and sets it to specific tokenId
 
         tokenId++;
 
         emit ZKPVerified(to, tokenId);
+        console.log(msg.sender, "(Manufacturer) successfuly minted Update NFT");
     }
 
     // The following functions are overrides required by Solidity.

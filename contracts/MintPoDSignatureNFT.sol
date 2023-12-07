@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.19 <=0.8.23;
 
+import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -27,6 +28,7 @@ contract MintPoDSignatureNFT is
         __ERC721_init("Proof of Delivery Signature", "PodS");
         __ERC721Enumerable_init();
         __Ownable_init(initialOwner);
+        console.log(msg.sender, "(IoT Device) initialized as contract creator");
     }
 
     function safeMint(address to) public {
@@ -36,6 +38,10 @@ contract MintPoDSignatureNFT is
             "Max number of PoD Signatures minted"
         ); // checks if the number of minted nfts have surpassed the max supply we set earlier
         _safeMint(to, tokenId); // mints NFT to owners address and sets it to specific tokenId
+        console.log(
+            msg.sender,
+            "(IoT Device) successfuly minted Proof of Delivery Signature NFT"
+        );
     }
 
     // The following functions are overrides required by Solidity.
