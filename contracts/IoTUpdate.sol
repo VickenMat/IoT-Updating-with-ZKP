@@ -30,7 +30,7 @@ contract IoTUpdate is OwnableUpgradeable {
     constructor(uint256 _numBlocksUpdateOpen) {
         numBlocksUpdateOpen = _numBlocksUpdateOpen;
         manufacturer = msg.sender;
-        reward = (baseReward / numBlocksUpdateOpen) * 100;
+        reward = (baseReward / _numBlocksUpdateOpen) * 100;
         blockStart = block.number;
     }
 
@@ -80,10 +80,10 @@ contract IoTUpdate is OwnableUpgradeable {
         // isPoDSignatureGenerated = false;
         // isProofApproved = false;
         require(
-            isPoDSignatureGenerated == false,
+            isPoDSignatureGenerated,
             "Proof of Delivery Signature must be generated!"
         );
-        require(isProofApproved == false, "Proof has not been approved yet!");
+        require(isProofApproved, "Proof has not been approved yet!");
         require(
             isUpdateApplied == false,
             "Device is currently up to date with the latest firmware!"
@@ -108,24 +108,28 @@ contract IoTUpdate is OwnableUpgradeable {
 
     function payout() public payable returns (address) {
         require(
-            isPoDSignatureGenerated == false,
+            isPoDSignatureGenerated,
             "Proof of Delivery Signature must be generated!"
         );
-        require(isProofApproved == false, "Proof has not been approved yet!");
+        require(isProofApproved, "Proof has not been approved yet!");
         require(
-            isUpdateApplied == false,
+            isUpdateApplied,
             "Device is currently up to date with the latest firmware!"
         );
         require(
             manufacturer.balance > 0,
             "Manufacturers account balance is not greater than 0"
         );
+        require(
+            msg.sender == manufacturer,
+            "Distributor must be the one sending the update to the IoT device"
+        );
         payable(distributor).transfer(msg.value);
         isDistributorPayed = true;
         console.log(
             "Manufacturer has paid the distributer out",
             reward,
-            "tokens"
+            "VTokens"
         );
         return (distributor);
     }
@@ -144,6 +148,10 @@ contract IoTUpdate is OwnableUpgradeable {
         // For simplicity, assuming `proof` is a bytes array
         string memory proof
     ) external {
+        require(
+            msg.sender == manufacturer,
+            "Only the manufacturer can verify the ZKP"
+        );
         // Call an external ZKP verification function or contract
         require(_verifyZKP(tokenId, proof), "ZKP verification failed");
 
