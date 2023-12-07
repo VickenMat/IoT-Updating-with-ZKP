@@ -12,6 +12,9 @@ contract MintUpdateNFT is
     ERC721EnumerableUpgradeable,
     OwnableUpgradeable
 {
+    // ZKP Verification Event
+    event ZKPVerified(address indexed owner, uint256 tokenId);
+
     uint256 private _nextTokenId;
     uint256 public maxSupply;
 
@@ -35,13 +38,18 @@ contract MintUpdateNFT is
         __Ownable_init(initialOwner);
     }
 
-    function safeMint(address to) public {
+    function safeMint(address to, string memory proof) public {
         uint256 tokenId = _nextTokenId++;
         require(
             tokenId <= (maxSupply - 1),
             "Max number of Update File NFTs minted"
         ); // checks if the number of minted nfts have surpassed the max supply we set earlier
+        require(_verifyZKP(tokenId, proof), "ZKP verification failed");
         _safeMint(to, tokenId); // mints NFT to owners address and sets it to specific tokenId
+
+        tokenId++;
+
+        emit ZKPVerified(to, tokenId);
     }
 
     // The following functions are overrides required by Solidity.
@@ -75,4 +83,35 @@ contract MintUpdateNFT is
     {
         return super.supportsInterface(interfaceId);
     }
+
+    // Begin ZKP Login/Functions
+    // Function to verify zero-knowledge proof
+    // THIS BREAK THE TESTING FOR VTOKEN
+    function verifyZKP(
+        uint256 tokenId,
+        // Add other proof parameters as needed
+        // For simplicity, assuming `proof` is a bytes array
+        string memory proof
+    ) external {
+        // Call an external ZKP verification function or contract
+        require(_verifyZKP(tokenId, proof), "ZKP verification failed");
+
+        // Emit an event or perform any action upon successful verification
+        emit ZKPVerified(ownerOf(tokenId), tokenId);
+    }
+
+    // Internal function to perform the actual ZKP verification
+    function _verifyZKP(
+        uint256 tokenId,
+        string memory proof
+    ) internal view returns (bool) {
+        // Implement your ZKP verification logic here
+        // This might involve calling an external contract or service
+        // and validating the proof against the provided parameters
+        // Return true if the verification succeeds, false otherwise
+        // For simplicity, always returning true in this example
+        return true;
+    }
+
+    // End ZKP Verification
 }
