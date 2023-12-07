@@ -55,7 +55,7 @@ contract IoTUpdate {
         iotDevice = _iotDevice;
     }
 
-    function test() public payable {
+    function update() public payable {
         require(
             isUpdateApplied,
             "Device is currently up to date with the latest firmware!"

@@ -61,7 +61,7 @@ describe("Deploy IoTUpdate Contract", () => {
 
     it("should reject updating without setting IoT device address", async () => {
       await expect(
-        IoTUpdateContract.connect(iotDevice).test({
+        IoTUpdateContract.connect(iotDevice).update({
           value: ethers.parseEther("1.0"),
         })
       ).to.be.revertedWith("IoT device address must be set before update");
@@ -81,12 +81,12 @@ describe("Deploy IoTUpdate Contract", () => {
 
     
   });
-  describe("test", function () {
+  describe("update", function () {
     // Existing test cases...
   
     it("should reject updating if IoT device address is not set", async () => {
       await expect(
-        IoTUpdateContract.connect(distributor).test({
+        IoTUpdateContract.connect(distributor).update({
           value: ethers.parseEther("1.0"),
         })
       ).to.be.revertedWith("IoT device address must be set before update");

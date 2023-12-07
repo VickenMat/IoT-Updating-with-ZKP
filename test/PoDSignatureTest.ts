@@ -23,6 +23,7 @@ describe("MintPoDSignatureNFT Contract", () => {
     it("should set the owner correctly", async () => {
       expect(await MintPoDSignatureNFTContract.owner()).to.equal(owner.address);
     });
+
   });
 
   describe("Minting", function () {
