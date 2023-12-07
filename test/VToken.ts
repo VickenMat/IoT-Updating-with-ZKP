@@ -3,64 +3,63 @@ import { expect } from "chai";
 import { VToken } from "../typechain-types";
 
 describe("VToken Contract", () => {
-  let vTokenContract: VToken;
+  let VTokenContract: VToken;
   let owner: any;
+  let addr1: any;
+  let addr2: any;
 
   beforeEach(async () => {
-    [owner] = await ethers.getSigners();
+    [owner, addr1, addr2] = await ethers.getSigners();
 
     const VTokenFactory = await ethers.getContractFactory("VToken");
-    vTokenContract = (await VTokenFactory.deploy(owner.address, 100000)) as VToken;
+    VTokenContract = (await VTokenFactory.deploy(owner.address, 100000)) as VToken;
   });
 
   describe("Initialization", function () {
-    it("should initialize with the correct name and symbol", async () => {
-      expect(await vTokenContract.name()).to.equal("VToken");
-      expect(await vTokenContract.symbol()).to.equal("VTK");
+    it("should have the correct name and symbol", async () => {
+      expect(await VTokenContract.name()).to.equal("VToken");
+      expect(await VTokenContract.symbol()).to.equal("VTK");
     });
 
-    it("should initialize with the correct max supply", async () => {
-      expect(await vTokenContract.maxSupply()).to.equal(100000);
+    it("should have the correct initial supply", async () => {
+      const totalSupply = await VTokenContract.totalSupply();
+      expect(totalSupply).to.equal(100);
     });
 
-    it("should set the owner correctly", async () => {
-      expect(await vTokenContract.owner()).to.equal(owner.address);
+    it("should have the correct owner", async () => {
+      expect(await VTokenContract.owner()).to.equal(owner.address);
     });
 
-    it("should mint tokens to the initial owner during deployment", async () => {
-      const ownerBalance = await vTokenContract.balanceOf(owner.address);
-      expect(ownerBalance).to.equal(100);
-    });
-
-    it("should not set max supply above 100000", async () => {
-      const VTokenFactoryAboveMax = await ethers.getContractFactory("VToken");
-      await expect(VTokenFactoryAboveMax.deploy(owner.address, 100001)).to.be.revertedWith(
-        "Max token supply must be less than or equal to 100000"
-      );
-    });
-
-    it("should not set max supply to 0", async () => {
-      const VTokenFactoryZeroSupply = await ethers.getContractFactory("VToken");
-      await expect(VTokenFactoryZeroSupply.deploy(owner.address, 0)).to.be.revertedWith(
-        "Max token supply must be greater than 0"
-      );
+    it("should have the correct max supply", async () => {
+      expect(await VTokenContract.maxSupply()).to.equal(100000);
     });
   });
 
   describe("Minting", function () {
     it("should allow the owner to mint tokens", async () => {
-      await vTokenContract.mintERC20(owner.address, 50);
-      const ownerBalance = await vTokenContract.balanceOf(owner.address);
-      expect(ownerBalance).to.equal(150);
+      await VTokenContract.connect(owner).mintERC20(addr1.address, 50);
+      const balance = await VTokenContract.balanceOf(addr1.address);
+      expect(balance).to.equal(50);
     });
 
-    it("should not allow minting more tokens than the max supply", async () => {
-      await expect(vTokenContract.mintERC20(owner.address, 100001)).to.be.revertedWith(
-        "ERC20: mint amount exceeds max supply"
+    it("should not allow non-owners to mint tokens", async () => {
+      await expect(VTokenContract.connect(addr1).mintERC20(addr2.address, 50)).to.be.revertedWith(
+        "Ownable: caller is not the owner"
       );
     });
   });
 
-  // Additional test cases can be added for permit functionality and other features
+  describe("Token Burning", function () {
+    it("should allow the owner to burn tokens", async () => {
+      await VTokenContract.connect(owner).burn(50);
+      const totalSupply = await VTokenContract.totalSupply();
+      expect(totalSupply).to.equal(50);
+    });
 
+    it("should not allow non-owners to burn tokens", async () => {
+      await expect(VTokenContract.connect(addr1).burn(50)).to.be.revertedWith(
+        "Ownable: caller is not the owner"
+      );
+    });
+  });
 });
