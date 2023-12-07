@@ -24,7 +24,7 @@ contract MintUpdateNFT is
             "Max number of Update File NFTs must be greater than 0"
         ); // throws error if max supply is set to 0
         require(
-            maxSupply <= 5,
+            maxSupply < 6,
             "Max number of Update File NFTs must be less than or equal to 5"
         ); // throws error if max supply is set to a number greater than 5
     }
