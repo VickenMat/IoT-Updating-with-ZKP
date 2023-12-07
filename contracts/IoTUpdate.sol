@@ -4,7 +4,7 @@ pragma solidity >=0.8.19 <=0.8.23;
 
 import "hardhat/console.sol";
 
-contract NFTTransfer {
+contract IoTUpdate {
     uint256 public immutable baseReward = 10; // base amount multiplier to distributor for completing process
     uint256 public immutable numBlocksUpdateOpen; // how many blocks to be open for process to be completed
     uint256 public immutable blockStart; // starting block used for rewarding
@@ -31,7 +31,7 @@ contract NFTTransfer {
     }
 
     // returns the base reward multiplier
-    function getBaseReward() public view returns (uint256) {
+    function getBaseReward() public pure returns (uint256) {
         return baseReward;
     }
 
