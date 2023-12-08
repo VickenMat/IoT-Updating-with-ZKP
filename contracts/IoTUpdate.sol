@@ -98,7 +98,7 @@ contract IoTUpdate is OwnableUpgradeable {
         console.log("Please begin the update process!");
     }
 
-    function update() public payable returns (address) {
+    function update() public returns (address) {
         require(
             isPoDSignatureGenerated,
             "Proof of Delivery Signature must be generated!"
