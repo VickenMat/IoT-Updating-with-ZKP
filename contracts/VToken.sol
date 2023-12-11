@@ -15,7 +15,7 @@ contract VToken is ERC20, ERC20Permit, Ownable, ERC20Burnable {
         address initialOwner,
         uint256 _maxSupply
     ) ERC20("VToken", "VTK") Ownable(initialOwner) ERC20Permit("VToken") {
-        // premints 1000 VTK
+        // premints 100 VTK
         mintERC20(msg.sender, 100);
         maxSupply = _maxSupply;
         require(
