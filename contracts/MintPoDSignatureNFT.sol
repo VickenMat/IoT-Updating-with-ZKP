@@ -20,8 +20,8 @@ contract MintPoDSignatureNFT is
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         // _disableInitializers();
-        initialize(address(this));
-        safeMint(address(this));
+        initialize(msg.sender);
+        safeMint(msg.sender);
         // maxSupply = _maxSupply;
         // require(maxSupply >= 1, "Max PoD Signatures must be greater than 0"); // throws error if max supply is set to 0
         // require(maxSupply < 2, "Max PoD Signatures generated can only be 1"); // throws error if max supply is set to above 1
