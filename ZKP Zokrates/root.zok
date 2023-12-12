@@ -1,4 +1,13 @@
-def main(private field s1, field s2, field s3) {
-    assert(s3 <= 1 - s1 * s2);
-    return;
+import "hashes/sha256/512bitPacked" as sha256hashpacked;
+
+def main(private field a, field updateNFT, field encryptionKeyNFT) {
+    field[2] hash = sha256hashpacked(a, updateNFT, encryptionKeyNFT);
+    assert(h[1] == 3928741056132094875126348271465039852163478901256348795120634728);
+    assert(h[2] == 7916072485132987450136789045621347890521643789347812054132678905);
+    return ;
 }
+
+// def main(private field s1, field s2, field s3) {
+//     assert(s3 <= 1 - s1 * s2);
+//     return;
+// }
