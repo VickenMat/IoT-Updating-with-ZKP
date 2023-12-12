@@ -1,0 +1,9 @@
+import "hashes/sha256/512bitPacked" as sha256hashpacked;
+
+def main(private field a, field updateNFT, field encryptionKeyNFT) {
+    field[2] hash = sha256hashpacked((a, updateNFT, encryptionKeyNFT));
+    // assert(updateNFT <= a+encryptionKeyNFT);
+    assert(h[1] == cbcf66ea40f8bea84482f695849e8aa960d3d3097d51252b72dd05d5b6c9ad22);
+    assert(h[2] == 286e764af505bbbc5b723402638d819f86b86bf07c86ee5a2f332d1110b69caa);
+    return;
+}

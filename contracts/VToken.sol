@@ -8,15 +8,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
-contract VToken is ERC20, ERC20Permit, Ownable, ERC20Burnable {
+// import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+contract VToken is ERC20, ERC20Permit, ERC20Burnable {
+    // using SafeERC20 for IERC20;
+    // IERC20 public token;
     uint256 public maxSupply;
 
     constructor(
-        address initialOwner,
+        // address _contractCreator,
         uint256 _maxSupply
-    ) ERC20("VToken", "VTK") Ownable(initialOwner) ERC20Permit("VToken") {
-        // premints 100 VTK
+    ) ERC20("VToken", "VTK") ERC20Permit("VToken") {
+        // premints VTK
+        mintERC20(address(this), 500);
+        console.log("Minted 500 VTokens to contract address");
         mintERC20(msg.sender, 100);
+        console.log(
+            "Minted 100 VTokens to the contract creator (manufacturer)"
+        );
+        mintERC20(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, 50);
+        console.log("Minted 100 VTokens to the distributor");
         maxSupply = _maxSupply;
         require(
             maxSupply <= 100000,
@@ -31,7 +42,27 @@ contract VToken is ERC20, ERC20Permit, Ownable, ERC20Burnable {
         //    (total + amount) <= maxSupply,
         //    "Number of tokens minted to this address plus tokens in circulation should be less than the max supply");
         _mint(to, amount); // _mint is the building block that allows us to write ERC20 extensions that implement a supply mechanism
-        console.log(msg.sender, "(Manufacturer) successfuly minted VTokens");
+        console.log(msg.sender, " successfuly minted VTokens");
+    }
+
+    function stakeTokens(address to, uint256 amount) external payable {
+        _transfer(msg.sender, address(this), amount);
+        console.log(
+            msg.sender,
+            "has staked",
+            amount,
+            "VToken(s) to the contract"
+        );
+    }
+
+    function withdrawTokens(address to, uint256 amount) external payable {
+        _transfer(address(this), to, amount);
+        console.log(
+            msg.sender,
+            "has withdrawn",
+            amount,
+            "VToken(s) from the contract"
+        );
     }
 
     /*

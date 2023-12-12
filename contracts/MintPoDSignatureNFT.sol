@@ -14,33 +14,33 @@ contract MintPoDSignatureNFT is
     OwnableUpgradeable
 {
     uint256 private _nextTokenId;
-    uint256 public maxSupply;
+
+    // uint256 public maxSupply;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(uint256 _maxSupply) {
+    constructor() {
         // _disableInitializers();
-        maxSupply = _maxSupply;
-        require(maxSupply >= 1, "Max PoD Signatures must be greater than 0"); // throws error if max supply is set to 0
-        require(maxSupply < 2, "Max PoD Signatures generated can only be 1"); // throws error if max supply is set to above 1
+        initialize(address(this));
+        safeMint(address(this));
+        // maxSupply = _maxSupply;
+        // require(maxSupply >= 1, "Max PoD Signatures must be greater than 0"); // throws error if max supply is set to 0
+        // require(maxSupply < 2, "Max PoD Signatures generated can only be 1"); // throws error if max supply is set to above 1
     }
 
     function initialize(address initialOwner) public initializer {
-        __ERC721_init("Proof of Delivery Signature", "PodS");
+        __ERC721_init("Proof of Delivery Signature", "PoDS");
         __ERC721Enumerable_init();
         __Ownable_init(initialOwner);
-        console.log(msg.sender, "(IoT Device) initialized as contract creator");
+        console.log(msg.sender, " initialized as contract creator");
     }
 
     function safeMint(address to) public {
         uint256 tokenId = _nextTokenId++;
-        require(
-            tokenId <= (maxSupply - 1),
-            "Max number of PoD Signatures minted"
-        ); // checks if the number of minted nfts have surpassed the max supply we set earlier
+        require(tokenId < 1, "Max number of PoD Signature NFTs minted"); // checks if the number of minted nfts have surpassed the max supply we set earlier
         _safeMint(to, tokenId); // mints NFT to owners address and sets it to specific tokenId
         console.log(
             msg.sender,
-            "(IoT Device) successfuly minted Proof of Delivery Signature NFT"
+            " successfuly minted Proof of Delivery Signature NFT to this contract address"
         );
     }
 

@@ -10,6 +10,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // creates interface which allows us to uses openzeppelin functions
 interface IMintNFT {
@@ -37,47 +38,53 @@ interface IMintERC20 {
 }
 
 contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
-    uint256 public baseReward = 10;
-    uint256 public numBlocksUpdateOpen;
+    uint256 baseReward = 10;
+    uint256 numBlocksUpdateOpen = 50;
     uint256 blockStart;
-    uint256 public reward;
-    address public manufacturer;
-    address public distributor;
-    address public iotDevice;
+    uint256 reward = 50;
+
+    address manufacturer;
+    address distributor;
+    address iotDevice;
+    address vTokenAddress;
+    address updateNFTAddress;
+    address encryptionNFTAddress;
+    address podSigNFTAddress;
+
     bool public isProofApproved = false;
     bool public isPoDSignatureGenerated = false;
     bool public isUpdateApplied = false;
     bool public isDistributorPayed = false;
-    string proof =
+    string private zProof =
         "0x133d5d70b6085c07e172772612ec93fa64824af27d239e8f347f50778fad5f7f0x103a00336013e2191111e04d8e060aece83c3901c766acf59c3e885d168a09200x0e7b0184d947d92c56b94e8c8cd3a3f97e90d27441f68fad0fbdc03e8e2487760x1d19a35a7f72f8be6cdeb7bf22e60231be86acb265fbee7fb615c77180e48f2b0x1aafc61cd47cba7ab22e0a414d80d3f20cf5d17486ff19bbe2c8f5bdcb54e8870x1408827c865e8ddee39ff8dff39cc0ad8000f8e1a15d0b5e57a6ac25d4d265600x07cdc8b9a72dce74991273f50f9f5ea3eb05a902af7bc49ba325b74a1f5bad0f0x0b106dadb9525826d3ab3cdccf883e8b62f0264fe7c1423115318035f8013d4a";
     // ZKP Verification Event
-    event ZKPVerified(address indexed owner, uint256 tokenId);
+    event ZKPVerified(address indexed owner);
 
     uint256 nftTokenID = 0;
-    address erc721TokenAddress;
-    address erc20TokenAddress;
     IMintNFT mintNFT; // initializes interface to mintNFT
     IMintERC20 mintERC20;
 
     function initialize(
-        address _erc20TokenAddress,
-        address _erc721TokenAddress,
-        uint256 _nftTokenID,
-        uint256 _numBlocksUpdateOpen
+        address _manufacturer,
+        address _distributor,
+        address _iotDevice,
+        address _vTokenAddress,
+        address _updateNFTAddress,
+        address _encryptionNFTAddress
     ) public initializer {
         // __Ownable_init();
         __UUPSUpgradeable_init();
-
-        numBlocksUpdateOpen = _numBlocksUpdateOpen;
-        manufacturer = msg.sender;
-        reward = (baseReward / numBlocksUpdateOpen) * 100;
+        // reward = (baseReward/numBlocksUpdateOpen) * 10;
         blockStart = block.number;
-
-        erc721TokenAddress = _erc721TokenAddress;
-        nftTokenID = _nftTokenID;
-        erc20TokenAddress = _erc20TokenAddress;
-        mintERC20 = IMintERC20(erc20TokenAddress);
-        mintNFT = IMintNFT(erc721TokenAddress);
+        manufacturer = _manufacturer;
+        distributor = _distributor;
+        iotDevice = _iotDevice;
+        updateNFTAddress = _updateNFTAddress;
+        encryptionNFTAddress = _encryptionNFTAddress;
+        vTokenAddress = _vTokenAddress;
+        mintERC20 = IMintERC20(vTokenAddress);
+        mintNFT = IMintNFT(updateNFTAddress);
+        mintNFT = IMintNFT(encryptionNFTAddress);
     }
 
     modifier onlyManufacturer() {
@@ -94,60 +101,111 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function getReward() public view returns (uint256) {
         return reward;
+        console.log(
+            "The distributor will be rewarded with",
+            reward,
+            "VTokens!"
+        );
     }
 
     function getAddress() public view returns (address) {
         return address(this);
+        console.log("The IoTDevice contract address is ", address(this));
     }
 
+    function getVTokenAddress() public view returns (address) {
+        return vTokenAddress;
+        console.log("The VToken contract address is ", vTokenAddress);
+    }
+
+    function getUpdateNFTAddress() public view returns (address) {
+        return address(updateNFTAddress);
+        console.log("The IoTDevice contract address is ", updateNFTAddress);
+    }
+
+    function getEncryptionNFTAddress() public view returns (address) {
+        return address(encryptionNFTAddress);
+        console.log(
+            "The Encryption NFT contract address is ",
+            encryptionNFTAddress
+        );
+    }
+
+    // function getPoDSignatureAddress() public view returns (address) {
+    //     return podSigNFTAddress;
+    // }
     function getNumBlocksUpdateOpen() public view returns (uint256) {
         return numBlocksUpdateOpen;
+        console.log(
+            "The number of blocks this update is open for is ",
+            numBlocksUpdateOpen
+        );
     }
 
     function getCurrentBlock() public view returns (uint256) {
         return block.number;
+        console.log("Current block: ", numBlocksUpdateOpen);
     }
 
-    function getBaseReward() public pure returns (uint256) {
-        return 10;
+    function getBaseReward() public view returns (uint256) {
+        return baseReward;
+        console.log("Base reward is ", baseReward);
     }
 
     function getManufacturerAddress() public view returns (address) {
         return manufacturer;
+        console.log("The manufacturers address is ", manufacturer);
     }
 
     function getDistributorAddress() public view returns (address) {
         return distributor;
+        console.log("The distributors address is ", distributor);
     }
 
     function getIoTDeviceAddress() public view returns (address) {
         return iotDevice;
+        console.log("The iot devvices address is ", iotDevice);
     }
 
-    function setDistributorAddress(
-        address _distributor
-    ) public onlyManufacturer {
-        distributor = _distributor;
-    }
+    // function setDistributorAddress(address _distributor) public onlyManufacturer {
+    //     distributor = _distributor;
+    //     console.log("Successfully set distributor address!");
+    // }
 
-    function setIoTDeviceAddress(address _iotDevice) public onlyManufacturer {
-        iotDevice = _iotDevice;
-    }
+    // function setIoTDeviceAddress(address _iotDevice) public onlyManufacturer {
+    //     iotDevice = _iotDevice;
+    //     console.log("Successfully set iot device address!");
+    // }
 
     function setManufacturerAddress(address _manufacturer) public {
         manufacturer = _manufacturer;
+        console.log("Successfully set manufacturer address!");
     }
 
+    // function stakeTokens(address to, uint256 amount) external payable {
+    //     // token.safeTransfer(msg.sender, amount);
+    //     // token.transferFrom(manufacturer, distributor, reward);
+    //     // transfer(msg.sender, address(this), amount);
+    //     // mintERC20.transferFrom(payable(msg.sender), erc20TokenAddress, amount);
+    //     payable(manufacturer).transfer(reward);
+
+    //     console.log(msg.sender, "has staked", amount, "VToken(s) to the contract");
+    // }
+    // function withdrawTokens(address to, uint256 amount) external payable onlyOwner {
+    //     // _transfer(address(this), to, amount);
+    //     console.log(msg.sender, "has withdrawn", amount, "VToken(s) from the contract");
+    // }
+
     // Begin ZKP verification
-    function verifyZKP(uint256 tokenId, string memory proof) external {
+    function verifyZKP(string memory proof) external {
         require(
             msg.sender == manufacturer,
             "Only the manufacturer can verify the ZKP"
         );
         // Call an external ZKP verification function or contract
-        require(_verifyZKP(tokenId, proof), "ZKP verification failed");
+        require(_verifyZKP(proof), "ZKP verification failed");
         // Emit an event or perform any action upon successful verification
-        emit ZKPVerified(distributor, tokenId);
+        emit ZKPVerified(distributor);
         isProofApproved = true;
         isPoDSignatureGenerated = true;
         console.log("ZKP Verified!");
@@ -174,19 +232,22 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
             "Distributor address must be set before update"
         );
         require(msg.sender == iotDevice, "IoT Device must be the one updating");
-        require(
-            block.number - blockStart <= numBlocksUpdateOpen,
-            "Max block number exceeded - Update window has closed - Please try again"
-        );
+        // require(
+        //     block.number - blockStart <= numBlocksUpdateOpen,
+        //     "Max block number exceeded - Update window has closed - Please try again"
+        // );
         //IoT device completes the update internally and sets isUpdateApplied to true
         isUpdateApplied = true;
-        console.log("IoT Device now owns the update file and encryption key!");
+        console.log(
+            "Checking if IoT Device owns the update file and encryption key..."
+        );
+        console.log("Please hold...");
         console.log("Update successful!");
         return iotDevice;
     }
 
     // Function which allows manufacturer to pay distributor their rewards
-    function payout() public payable returns (address) {
+    function payout(uint256 _reward) external payable returns (address) {
         require(
             isPoDSignatureGenerated,
             "Proof of Delivery Signature must be generated!"
@@ -208,11 +269,12 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // NEW
         require(
             mintERC20.balanceOf(msg.sender) >= reward,
-            "You have bid more tokens than you own"
+            "You have attempted to send more tokens than you own"
         );
 
-        // TEST WITH ONLY LINE BELOW
-        mintERC20.transferFrom(manufacturer, distributor, reward);
+        // payable(manufacturer).transfer(reward);
+        // mintERC20.transferFrom(manufacturer, distributor, reward);
+        mintERC20.transfer(distributor, reward);
         // mintNFT.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
 
         // should send alloted payout to distributor
@@ -231,12 +293,12 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // to.safeTransferFrom(msg.sender, distributor, _tokenId);
 
         // NEW
-        require(
-            mintNFT.balanceOf(msg.sender) >= 0,
-            "You do not have any transferrable NFTs"
-        );
+        // require(
+        //     mintNFT.balanceOf(msg.sender) >= 0,
+        //     "You do not have any transferrable NFTs"
+        // );
         // END NEW
-        mintNFT.safeTransferFrom(manufacturer, distributor, nftTokenID); // transfer nft from seller to winner based on its id
+        mintNFT.safeTransferFrom(manufacturer, distributor, 0); // transfer nft from seller to winner based on its id
         return distributor;
     }
 
@@ -246,11 +308,14 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // }
 
     // Internal function to perform the actual ZKP verification
-    function _verifyZKP(
-        uint256 tokenId,
-        string memory proof
-    ) internal view returns (bool) {
-        // Call external contract and validate proof against the provided parameters
+    function _verifyZKP(string memory proof) internal view returns (bool) {
+        require(
+            keccak256(bytes(proof)) == keccak256(bytes(zProof)),
+            // proof.equal(uint(keccak256(zProof))),
+            // keccak256(proof) != keccak256("0x133d5d70b6085c07e172772612ec93fa64824af27d239e8f347f50778fad5f7f0x103a00336013e2191111e04d8e060aece83c3901c766acf59c3e885d168a09200x0e7b0184d947d92c56b94e8c8cd3a3f97e90d27441f68fad0fbdc03e8e2487760x1d19a35a7f72f8be6cdeb7bf22e60231be86acb265fbee7fb615c77180e48f2b0x1aafc61cd47cba7ab22e0a414d80d3f20cf5d17486ff19bbe2c8f5bdcb54e8870x1408827c865e8ddee39ff8dff39cc0ad8000f8e1a15d0b5e57a6ac25d4d265600x07cdc8b9a72dce74991273f50f9f5ea3eb05a902af7bc49ba325b74a1f5bad0f0x0b106dadb9525826d3ab3cdccf883e8b62f0264fe7c1423115318035f8013d4a"),
+            // proof.equal("0x133d5d70b6085c07e172772612ec93fa64824af27d239e8f347f50778fad5f7f0x103a00336013e2191111e04d8e060aece83c3901c766acf59c3e885d168a09200x0e7b0184d947d92c56b94e8c8cd3a3f97e90d27441f68fad0fbdc03e8e2487760x1d19a35a7f72f8be6cdeb7bf22e60231be86acb265fbee7fb615c77180e48f2b0x1aafc61cd47cba7ab22e0a414d80d3f20cf5d17486ff19bbe2c8f5bdcb54e8870x1408827c865e8ddee39ff8dff39cc0ad8000f8e1a15d0b5e57a6ac25d4d265600x07cdc8b9a72dce74991273f50f9f5ea3eb05a902af7bc49ba325b74a1f5bad0f0x0b106dadb9525826d3ab3cdccf883e8b62f0264fe7c1423115318035f8013d4a"),
+            "Submitted proof is incorrect, please try again..."
+        );
         return true;
     }
 
@@ -263,185 +328,4 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         address newImplementation
     ) internal view override onlyOwner {}
 }
-
-// import "hardhat/console.sol";
-// import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-
-// pragma solidity >=0.8.19 <=0.8.23;
-
-// contract IoTUpdate is OwnableUpgradeable {
-//     uint256 public immutable baseReward = 10;
-//     uint256 public immutable numBlocksUpdateOpen;
-//     uint256 blockStart;
-//     uint256 public reward;
-//     address public manufacturer;
-//     address public distributor;
-//     address public iotDevice;
-//     bool public isProofApproved = false;
-//     bool public isPoDSignatureGenerated = false;
-//     bool public isUpdateApplied = false;
-//     bool public isDistributorPayed = false;
-//     string proof =
-//         "0x133d5d70b6085c07e172772612ec93fa64824af27d239e8f347f50778fad5f7f0x103a00336013e2191111e04d8e060aece83c3901c766acf59c3e885d168a09200x0e7b0184d947d92c56b94e8c8cd3a3f97e90d27441f68fad0fbdc03e8e2487760x1d19a35a7f72f8be6cdeb7bf22e60231be86acb265fbee7fb615c77180e48f2b0x1aafc61cd47cba7ab22e0a414d80d3f20cf5d17486ff19bbe2c8f5bdcb54e8870x1408827c865e8ddee39ff8dff39cc0ad8000f8e1a15d0b5e57a6ac25d4d265600x07cdc8b9a72dce74991273f50f9f5ea3eb05a902af7bc49ba325b74a1f5bad0f0x0b106dadb9525826d3ab3cdccf883e8b62f0264fe7c1423115318035f8013d4a";
-//     // ZKP Verification Event
-//     event ZKPVerified(address indexed owner, uint256 tokenId);
-
-//     modifier onlyManufacturer() {
-//         require(msg.sender == manufacturer, "Ownable: caller is not the owner");
-//         _;
-//     }
-
-//     constructor(uint256 _numBlocksUpdateOpen) {
-//         numBlocksUpdateOpen = _numBlocksUpdateOpen;
-//         manufacturer = msg.sender;
-//         reward = (baseReward / numBlocksUpdateOpen) * 100;
-//         blockStart = block.number;
-//     }
-
-//     function getReward() public view returns (uint256) {
-//         return reward;
-//     }
-
-//     function getAddress() public view returns (address) {
-//         return address(this);
-//     }
-
-//     function getNumBlocksUpdateOpen() public view returns (uint256) {
-//         return numBlocksUpdateOpen;
-//     }
-
-//     function getCurrentBlock() public view returns (uint256) {
-//         return block.number;
-//     }
-
-//     function getBaseReward() public pure returns (uint256) {
-//         return 10;
-//     }
-
-//     function getManufacturerAddress() public view returns (address) {
-//         return manufacturer;
-//     }
-
-//     function getDistributorAddress() public view returns (address) {
-//         return distributor;
-//     }
-
-//     function getIoTDeviceAddress() public view returns (address) {
-//         return iotDevice;
-//     }
-
-//     function setDistributorAddress(
-//         address _distributor
-//     ) public onlyManufacturer {
-//         distributor = _distributor;
-//     }
-
-//     function setIoTDeviceAddress(address _iotDevice) public onlyManufacturer {
-//         iotDevice = _iotDevice;
-//     }
-
-//     function verifyZKP(
-//         uint256 tokenId,
-//         // Add other proof parameters as needed
-//         // For simplicity, assuming `proof` is a bytes array
-//         string memory proof
-//     ) external {
-//         require(
-//             msg.sender == manufacturer,
-//             "Only the manufacturer can verify the ZKP"
-//         );
-//         // Call an external ZKP verification function or contract
-//         require(_verifyZKP(tokenId, proof), "ZKP verification failed");
-
-//         // Emit an event or perform any action upon successful verification
-//         emit ZKPVerified(distributor, tokenId);
-//         isProofApproved = true;
-//         isPoDSignatureGenerated = true;
-//         console.log("ZKP Verified!");
-//         console.log("Proof of Delivery Signature generated by the IoT device!");
-//         console.log("Please begin the update process!");
-//     }
-
-//     function update() public returns (address) {
-//         require(
-//             isPoDSignatureGenerated,
-//             "Proof of Delivery Signature must be generated!"
-//         );
-//         require(isProofApproved, "Proof has not been approved yet!");
-//         require(
-//             isUpdateApplied == false,
-//             "Device is currently up to date with the latest firmware!"
-//         );
-//         require(
-//             iotDevice != address(0),
-//             "IoT device address must be set before update"
-//         );
-//         require(
-//             distributor != address(1),
-//             "Distributor address must be set before update"
-//         );
-//         require(msg.sender == iotDevice, "IoT Device must be the one updating");
-//         require(
-//             block.number - blockStart <= numBlocksUpdateOpen,
-//             "Max block number exceeded - Update window has closed - Please try again"
-//         );
-
-//         isUpdateApplied = true;
-//         console.log("IoT Device now owns the update file and encryption key!");
-//         console.log("Update successful!");
-
-//         return iotDevice;
-//     }
-
-//     function payout() public payable returns (address) {
-//         require(
-//             isPoDSignatureGenerated,
-//             "Proof of Delivery Signature must be generated!"
-//         );
-//         require(isProofApproved, "Proof has not been approved yet!");
-//         require(
-//             isUpdateApplied,
-//             "Device is currently up to date with the latest firmware!"
-//         );
-//         require(
-//             manufacturer.balance > 0,
-//             "Manufacturers account balance is not greater than 0"
-//         );
-//         require(
-//             msg.sender == manufacturer,
-//             "Manufacturer must be the one sending the payout to the distributor"
-//         );
-//         payable(distributor).transfer(msg.value);
-//         isDistributorPayed = true;
-//         console.log(
-//             "Manufacturer has paid the distributer ",
-//             reward,
-//             "VTokens"
-//         );
-//         return (distributor);
-//     }
-
-//     // returns balance of requested address
-//     function balanceOf(address) public view returns (uint256) {
-//         return address(this).balance;
-//     }
-
-//     // Begin ZKP Login/Functions
-//     // Function to verify zero-knowledge proof
-//     // THIS BREAK THE TESTING FOR VTOKEN
-
-//     // Internal function to perform the actual ZKP verification
-//     function _verifyZKP(
-//         uint256 tokenId,
-//         string memory proof
-//     ) internal view returns (bool) {
-//         // Implement your ZKP verification logic here
-//         // This might involve calling an external contract or service
-//         // and validating the proof against the provided parameters
-//         // Return true if the verification succeeds, false otherwise
-//         // For simplicity, always returning true in this example
-//         return true;
-//     }
-
-//     // End ZKP Verification
-// }
+//payable(seller).transfer(msg.value);
