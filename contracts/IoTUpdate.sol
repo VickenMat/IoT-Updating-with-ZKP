@@ -54,7 +54,7 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     bool public isProofApproved = false;
     bool public isPoDSignatureGenerated = false;
     bool public isUpdateApplied = false;
-    bool public isDistributorPayed = false;
+    bool public isDistributorPaid = false;
     string private zProof =
         "0x133d5d70b6085c07e172772612ec93fa64824af27d239e8f347f50778fad5f7f0x103a00336013e2191111e04d8e060aece83c3901c766acf59c3e885d168a09200x0e7b0184d947d92c56b94e8c8cd3a3f97e90d27441f68fad0fbdc03e8e2487760x1d19a35a7f72f8be6cdeb7bf22e60231be86acb265fbee7fb615c77180e48f2b0x1aafc61cd47cba7ab22e0a414d80d3f20cf5d17486ff19bbe2c8f5bdcb54e8870x1408827c865e8ddee39ff8dff39cc0ad8000f8e1a15d0b5e57a6ac25d4d265600x07cdc8b9a72dce74991273f50f9f5ea3eb05a902af7bc49ba325b74a1f5bad0f0x0b106dadb9525826d3ab3cdccf883e8b62f0264fe7c1423115318035f8013d4a";
     // ZKP Verification Event
@@ -274,12 +274,11 @@ contract IoTUpdate is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         // payable(manufacturer).transfer(reward);
         // mintERC20.transferFrom(manufacturer, distributor, reward);
-        mintERC20.transfer(distributor, reward);
         // mintNFT.safeTransferFrom(seller, winner, nftTokenID); // transfer nft from seller to winner based on its id
-
         // should send alloted payout to distributor
         // payable(distributor).transfer(msg.value);
-        isDistributorPayed = true;
+        mintERC20.transfer(distributor, reward);
+        isDistributorPaid = true;
         console.log(
             "Manufacturer has paid the distributer ",
             reward,

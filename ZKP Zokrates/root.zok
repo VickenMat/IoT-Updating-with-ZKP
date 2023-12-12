@@ -1,7 +1,7 @@
 import "hashes/sha256/512bitPacked" as sha256hashpacked;
 
-def main(private field a, field updateNFT, field encryptionKeyNFT) {
-    field[2] hash = sha256hashpacked(a, updateNFT, encryptionKeyNFT);
+def main(private field update, field metadata) {
+    field[2] hash = sha256hashpacked(update, metadata);
     assert(h[1] == 3928741056132094875126348271465039852163478901256348795120634728);
     assert(h[2] == 7916072485132987450136789045621347890521643789347812054132678905);
     return ;
